@@ -5,7 +5,6 @@ import torch.nn.functional as F
 import ignite
 from tqdm import trange
 
-
 class BaseTorch(object, metaclass=ABCMeta):
     def __init__(self, config):
         self.metrics = {"accuracy": ignite.metrics.Accuracy()}
@@ -120,36 +119,70 @@ def distill(
     student: torch.nn.Module,
     optimizer: torch.optim.Optimizer,
     train_loader: torch.utils.data.DataLoader,
-    test_loader: torch.utils.data.DataLoader,
+    test_loader: torch.utils.data.DataLoader = None,
     iterations: int = 5000, 
     test_freq: int = 1000,
     alpha: float = 0.6, 
     T: float = 2.5
 ):
-    algo, process_log = _init_dist(teacher, student, ST(alpha, T), optimizer, iterations)
+    algo, process_log = _init_dist(teacher, student, ST({"alpha": alpha, "T": T}), optimizer, iterations)
 
     train_tmp = ""
     test_tmp = ""
 
-    train_iter = iter(train_loader)
-    for idx in range(iterations):
-        try:
-            x, y = train_iter.next()
-        except StopIteration:
-            train_iter = iter(train_loader)
-            x, y = train_iter.next()
-        process_log.update(1)
-        loss = algo.teach_step(x, y)
-        result = algo.get_metrics()
-        train_tmp = result_to_tqdm_template(result)
+    # train_iter = iter(train_loader)
+    # for idx in range(iterations):
+    #     try:
+    #         x, y = train_iter.next()
+    #     except StopIteration:
+    #         train_iter = iter(train_loader)
+    #         x, y = train_iter.next()
+    #     process_log.update(1)
+    #     loss = algo.teach_step(x, y)
+    #     result = algo.get_metrics()
+    #     train_tmp = result_to_tqdm_template(result)
 
-        if idx % test_freq == 0 and idx != 0:
-            process_log.set_description_str("Testing ")
-            algo.reset_metrics()
-            result = algo.test(test_loader)
-            test_tmp = result_to_tqdm_template(result, training=False)
-            process_log.set_description_str("Training")
-        postfix = train_tmp + "- " + test_tmp
-        process_log.set_postfix_str(postfix)
+    #     if test_loader is not None and test_freq > 0:
+    #         if idx % test_freq == 0 and idx != 0:
+    #             process_log.set_description_str("Testing ")
+    #             algo.reset_metrics()
+    #             result = algo.test(test_loader)
+    #             test_tmp = result_to_tqdm_template(result, training=False)
+    #             process_log.set_description_str("Training")
+    #     postfix = train_tmp + "- " + test_tmp
+    #     process_log.set_postfix_str(postfix)
+
+    device = next(teacher.parameters()).device
+
+    n_iter = 0
+    while True:
+        for i, batch in enumerate(train_loader):
+            # n_iter += len(batch[-1])
+
+            
+
+            process_log.update(1)
+            loss = algo.teach_step(batch[0].to(device), batch[1].to(device))
+            result = algo.get_metrics()
+            train_tmp = result_to_tqdm_template(result)
+
+            if test_loader is not None and test_freq > 0:
+                if n_iter % test_freq == 0 and n_iter != 0:
+                    process_log.set_description_str("Testing ")
+                    algo.reset_metrics()
+                    result = algo.test(test_loader)
+                    test_tmp = result_to_tqdm_template(result, training=False)
+                    process_log.set_description_str("Training")
+            postfix = train_tmp + "- " + test_tmp
+
+            n_iter += 1
+            
+            process_log.set_postfix_str(postfix)
+
+            if n_iter >= iterations:
+                break
+
+        if n_iter >= iterations:
+            break
 
     return student
