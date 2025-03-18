@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>&lt;no title&gt; &mdash; DFDistill  documentation</title>
+  <title>Data-Free Distillation &mdash; DFDistill  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=fd3f3429" />
@@ -43,10 +43,16 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"><ul class="simple">
+              <p class="caption" role="heading"><span class="caption-text">Main Info:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Data-Free Distillation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#description">Description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#algorithms-implemented">Algorithms Implemented</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#related-work">Related Work</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#tech-stack">Tech Stack</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#links">Links</a></li>
 </ul>
-</div>
+
         </div>
       </div>
     </nav>
@@ -61,7 +67,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">&lt;no title&gt;</li>
+      <li class="breadcrumb-item active">Data-Free Distillation</li>
       <li class="wy-breadcrumbs-aside">
               <a href="https://github.com/Intelligent-Systems-Phystech/DFDistill/blob/main./docs/info.rst" class="fa fa-github"> Edit on GitHub</a>
       </li>
@@ -71,7 +77,57 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  
+  <section id="data-free-distillation">
+<h1>Data-Free Distillation<a class="headerlink" href="#data-free-distillation" title="Link to this heading"></a></h1>
+<p><strong>Authors</strong>: Ernest Nasyrov, Nikita Okhotnikov, Yuri Sapronov, Vladimir Solodkin</p>
+</section>
+<section id="description">
+<h1>Description<a class="headerlink" href="#description" title="Link to this heading"></a></h1>
+<p>This project focuses on implementing Data-Free Distillation in a simple and clear manner.
+Classical approaches to this problem perofrm distillation using logits, responses or hidden
+state from teacher obtained from data. However in some cases we cannot use the original data,
+and thus these methods become unapplicable. Our goal is to create a well-documented and
+efficient implementation for this complicated setting.</p>
+</section>
+<section id="algorithms-implemented">
+<h1>Algorithms Implemented<a class="headerlink" href="#algorithms-implemented" title="Link to this heading"></a></h1>
+<p>We plan to implement the following distillation techniques in our library:</p>
+<ul class="simple">
+<li><p><cite>Data-Free Knowledge Distillation using Top Layer Activation Statistics</cite></p></li>
+<li><p><cite>Data-Free Knowledge Distillation using Spectral Methods</cite></p></li>
+<li><p><cite>Data-Free Adversarial Distillation</cite></p></li>
+<li><p><cite>Data-Free Knowledge Transfer via DeepInversion</cite></p></li>
+</ul>
+</section>
+<section id="related-work">
+<h1>Related Work<a class="headerlink" href="#related-work" title="Link to this heading"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://arxiv.org/pdf/1710.07535">Original paper</a></p></li>
+<li><p><a class="reference external" href="https://arxiv.org/pdf/1912.11006">Adversarial Approach</a></p></li>
+<li><p><a class="reference external" href="https://openaccess.thecvf.com/content_CVPR_2020/papers/Yin_Dreaming_to_Distill_Data-Free_Knowledge_Transfer_via_DeepInversion_CVPR_2020_paper.pdf">Dreaming to Distill</a></p></li>
+</ul>
+</section>
+<section id="tech-stack">
+<h1>Tech Stack<a class="headerlink" href="#tech-stack" title="Link to this heading"></a></h1>
+<p>The project is implemented using:</p>
+<ul class="simple">
+<li><p><strong>PyPI</strong></p></li>
+<li><p><strong>PyTorch</strong> for tensor computation and differentiation</p></li>
+<li><p><strong>Matplotlib</strong> for plotting</p></li>
+<li><p><strong>Transformers</strong></p></li>
+<li><p><strong>Neptune</strong> for logging</p></li>
+<li><p><strong>Aquvitae</strong> for distillation</p></li>
+</ul>
+</section>
+<section id="links">
+<h1>Links<a class="headerlink" href="#links" title="Link to this heading"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="./docs">Project Documentation</a></p></li>
+<li><p><a class="reference external" href="https://github.com/intsystems/BMM/blob/main-24-25/projects.md">Project Plan</a></p></li>
+<li><p><a class="reference external" href="./DFDistill_Blogpost.pdf">Blogpost</a></p></li>
+</ul>
+</section>
+
 
            </div>
           </div>
