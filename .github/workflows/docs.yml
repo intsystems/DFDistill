@@ -39,4 +39,5 @@ jobs:
         with:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           BRANCH: gh-pages
-          FOLDER: public
+          publish_dir: _build/
+          force_orphan: true
