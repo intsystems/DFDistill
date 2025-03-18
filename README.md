@@ -34,11 +34,12 @@ We plan to implement the following distillation techniques in our library:
 
 The project is implemented using:
 
-- **Python**
+- **PyPI**
 - **PyTorch** for tensor computation and differentiation
-- **NumPy** for numerical computations
-- **SciPy** for advanced mathematical functions
-- **Jupyter Notebooks** for experimentation and visualization
+- **Matplotlib** for plotting
+- **Transformers** 
+- **Neptune** for logging
+- **Aquvitae** for distillation
 
 You can install the required packages using pip:
 
