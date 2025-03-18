@@ -45,7 +45,7 @@ html_context = {
 	"github_user": "Intelligent-Systems-Phystech",
 	"github_repo": "DFDistill",
 	"github_version": "main",
-	"conf_py_path": "./docs"
+	"conf_py_path": "./docs/"
 }
 
 templates_path = ['_templates']
