@@ -8,5 +8,13 @@ Welcome to DFDistill's documentation!
 =====================================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 1
+   :caption: Main Info:
+   
+   info.rst
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Get Started:
+   
+   installation.rst
