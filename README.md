@@ -60,4 +60,5 @@ You can install the required packages using pip:
 
 - [Project Documentation](./docs)
 - [Project Plan](https://github.com/intsystems/BMM/blob/main-24-25/projects.md)
+- [Blogpost](./DFDistill_Blogpost.pdf)
 ---
