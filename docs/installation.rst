@@ -1,1 +1,1 @@
-.. include:: ../../dfdistill/README.rst
+.. include:: ../dfdistill/README.rst
