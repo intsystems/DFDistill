@@ -6,14 +6,31 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "jupyter>=1.1.1",
-    "numpy>=2.2.3",
-    "pytorch-ignite>=0.5.1",
-    "torch>=2.6.0",
+    "numpy>=2.2.5",
+    "pandas>=2.2.3",
+    "pytorch-ignite>=0.5.2",
+    "torch>=2.7.0",
+    "torchvision>=0.22.0",
     "tqdm>=4.67.1",
 ]
 
 [dependency-groups]
 dev = [
-    "sphinx>=8.2.1",
+    "sphinx>=8.2.3",
     "sphinx-rtd-theme>=3.0.2",
+]
+
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+
+[tool.uv.sources]
+torch = [
+  { index = "pytorch-cu128", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+]
+torchvision = [
+  { index = "pytorch-cu128", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
 ]
