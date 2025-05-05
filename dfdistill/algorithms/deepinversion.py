@@ -176,8 +176,9 @@ def distill_deep_inversion(
     student=None,
     config={},
     total_iterations=100000,
+    distill_k_times=8,
     batch_size=256,
-    deep_inversion_batch_size=2048,
+    deep_inversion_batch_size=1024,
     deep_inversion_iterations=200,
     n_classes=100,
     image_shape=(3, 32, 32),
@@ -191,7 +192,7 @@ def distill_deep_inversion(
     adi_scale=1, # paper suggests 10, but the repo just ignores "adaptive" case..
 ):
     
-    
+
     deep_inversion = DeepInversionClass(
         teacher=teacher,
         student=student,
@@ -231,7 +232,7 @@ def distill_deep_inversion(
             optimizer=optimizer,
             train_loader=loader,
             test_loader=None,
-            iterations=deep_inversion_batch_size // batch_size,
+            iterations=distill_k_times * deep_inversion_batch_size // batch_size,
             test_freq=-1,
             alpha=alpha,
             T=T
