@@ -33,6 +33,29 @@ class Trainer:
         reduce_lr_each_epoch=None,
         verbose=None
     ):
+        """
+        Trains the model using the specified data loaders and configuration.
+
+        Parameters:
+        - train_loader (DataLoader, optional): DataLoader for training data. Required if train_data is not provided.
+        - val_loader (DataLoader, optional): DataLoader for validation data. Required if val_data is not provided.
+        - train_data (Dataset, optional): Dataset for training data. Used to create a DataLoader if train_loader is not provided.
+        - val_data (Dataset, optional): Dataset for validation data. Used to create a DataLoader if val_loader is not provided.
+        - batch_size (int, optional): Batch size for DataLoader. If not provided, uses value from train_config or defaults to 1.
+        - model (nn.Module, optional): Model to train. If not provided, uses the model assigned to the Trainer instance.
+        - max_iters (int, optional): Maximum number of training iterations. Overrides max_epochs if set.
+        - max_epochs (int, optional): Maximum number of training epochs.
+        - optimizer (torch.optim.Optimizer or str, optional): Optimizer to use. Can be an instantiated optimizer or the name of an optimizer.
+        - lr (float, optional): Learning rate for the optimizer. Defaults to 1e-4 if not provided.
+        - evaluate_every (int, optional): Frequency of evaluation in terms of iterations. Defaults to -1 (no evaluation).
+        - log_every (int, optional): Frequency of logging in terms of iterations. Defaults to -1 (no logging).
+        - reduce_lr_each_epoch (float, optional): Factor by which to reduce the learning rate each epoch.
+        - verbose (bool, optional): Whether to print training progress and metrics.
+
+        Returns:
+        - nn.Module: The trained model.
+        """
+
         if train_loader is None:
             if train_data is not None:
                 if isinstance(train_data, Dataset):
@@ -226,6 +249,21 @@ class Trainer:
         val_loader=None,
         model=None
     ):  
+        """
+        Evaluate the model on the given validation data.
+
+        Parameters
+        ----------
+        val_loader : torch.utils.data.DataLoader, optional
+            The validation data loader. If None, return empty metrics.
+        model : torch.nn.Module, optional
+            The model to be evaluated. If None, use the model in the Trainer instance.
+
+        Returns
+        -------
+        dict
+            A dictionary containing the evaluation metrics.
+        """
         if model is None:
             model = self.model
 
