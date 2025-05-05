@@ -78,6 +78,28 @@ class DeepInversionClass:
         adi_scale=1, # paper suggests 10, but the repo just ignores "adaptive" case..
         device="cuda"
     ):  
+        """
+        Initialization method for the DeepInversionClass.
+
+        Args:
+            teacher (torch.nn.Module): The teacher model to distill knowledge from.
+            student (torch.nn.Module): The student model to distill knowledge into.
+            batch_size (int): Batch size for generating images via deep inversion.
+            n_iterations (int): Number of iterations for generating images through deep inversion.
+            n_classes (int): Number of classes in the dataset.
+            path (str): Path to save generated images.
+            final_data_path (str): Path to save the final generated dataset.
+            image_shape (tuple): Shape of the input images.
+            r_feature (float): Regularization factor for feature statistics loss.
+            first_bn_multiplier (float): Multiplier for the first batch norm layer's regularization.
+            tv_l1 (float): L1 regularization factor for total variation loss.
+            tv_l2 (float): L2 regularization factor for total variation loss.
+            l2 (float): L2 regularization factor for the input images.
+            main_loss_multiplier (float): Multiplier for the main loss.
+            lr (float): Learning rate for generating images.
+            adi_scale (float): Multiplier for adaptive deep inversion (paper suggests 10, but the repo just ignores "adaptive" case..
+            device (str): Device to use (cuda or cpu).
+        """
         self.device = device 
 
         self.path = path
@@ -112,6 +134,19 @@ class DeepInversionClass:
     def get_images(
         self,
     ):
+        """
+        Generates synthetic images by performing deep inversion on the teacher model.
+
+        This function uses gradient-based optimization to generate images that resemble
+        the data used to train the teacher model. It performs several iterations of optimization
+        to refine the generated images while applying various regularization techniques
+        such as total variation loss and feature statistics loss.
+
+        Returns:
+            Tuple[torch.Tensor, torch.Tensor]: A tuple containing the denormalized generated images
+            and the corresponding target labels.
+        """
+
         device = self.device
         teacher = self.teacher
         student = self.student
@@ -212,8 +247,38 @@ def distill_deep_inversion(
     lr=0.1,
     adi_scale=1, # paper suggests 10, but the repo just ignores "adaptive" case..
     device="cuda"
-):
-    
+):    
+
+    """
+    Performs data-free knowledge distillation using deep inversion of the teacher model.
+
+    Args:
+        teacher (torch.nn.Module): The teacher model to distill knowledge from.
+        student (torch.nn.Module): The student model to distill knowledge into.
+        distill_config (dict): Configuration for distillation containing keys:
+            - "alpha" (float): Weight for the distillation loss.
+            - "T" (float): Temperature for the softmax in distillation.
+            - "lr" (float): Learning rate for the optimizer.
+        total_iterations (int): Total number of iterations for the distillation process.
+        distill_k_times (int): Number of distillation steps per batch of generated data.
+        batch_size (int): Batch size for each distillation step.
+        deep_inversion_batch_size (int): Batch size for generating images via deep inversion.
+        deep_inversion_iterations (int): Number of iterations for generating images through deep inversion.
+        n_classes (int): Number of classes in the dataset.
+        image_shape (tuple): Shape of the input images.
+        r_feature (float): Regularization factor for feature statistics loss.
+        first_bn_multiplier (float): Multiplier for the first batch norm layer's regularization.
+        tv_l1 (float): L1 regularization factor for total variation loss.
+        tv_l2 (float): L2 regularization factor for total variation loss.
+        l2 (float): L2 regularization factor for the input images.
+        main_loss_multiplier (float): Multiplier for the main loss.
+        lr (float): Learning rate for generating images.
+        adi_scale (float): Scale for adaptive distillation.
+        device (str): Device to perform computations on.
+
+    Returns:
+        torch.nn.Module: The updated student model after distillation.
+    """
 
     deep_inversion = DeepInversionClass(
         teacher=teacher,
