@@ -34,6 +34,7 @@ def run_distillation(
         'teacher': teacher,
         'student': student,
         'test_loader': test_loader,
+        'train_loader': train_loader
     })
 
     return train_func(**kwargs)
