@@ -107,10 +107,20 @@ def result_to_tqdm_template(result, training=True):
     return template[:-1]
 
 
-def _init_dist(teacher, student, algo, optimizer, iterations):
+def _init_dist(
+    teacher, 
+    student, 
+    algo, 
+    optimizer, 
+    iterations,
+    verbose=True
+):
     algo.set_model(teacher, student, optimizer)
     bar_format = "{desc} - {n_fmt}/{total_fmt} [{bar:30}] ELP: {elapsed}{postfix}"
-    process_log = trange(iterations, desc="Training", position=0, bar_format=bar_format)
+    if verbose:
+        process_log = trange(iterations, desc="Training", position=0, bar_format=bar_format)
+    else:
+        process_log = None
     return algo, process_log
     
 
@@ -123,9 +133,17 @@ def distill(
     iterations: int = 5000, 
     test_freq: int = 1000,
     alpha: float = 0.6, 
-    T: float = 2.5
+    T: float = 2.5,
+    verbose=True
 ):
-    algo, process_log = _init_dist(teacher, student, ST({"alpha": alpha, "T": T}), optimizer, iterations)
+    algo, process_log = _init_dist(
+        teacher, 
+        student, 
+        ST({"alpha": alpha, "T": T}), 
+        optimizer, 
+        iterations,
+        verbose=verbose
+    )
 
     train_tmp = ""
     test_tmp = ""
@@ -160,24 +178,26 @@ def distill(
             # n_iter += len(batch[-1])
 
             
-
-            process_log.update(1)
+            if verbose:
+                process_log.update(1)
             loss = algo.teach_step(batch[0].to(device), batch[1].to(device))
             result = algo.get_metrics()
             train_tmp = result_to_tqdm_template(result)
 
             if test_loader is not None and test_freq > 0:
                 if n_iter % test_freq == 0 and n_iter != 0:
-                    process_log.set_description_str("Testing ")
+                    if verbose:
+                        process_log.set_description_str("Testing ")
                     algo.reset_metrics()
                     result = algo.test(test_loader)
                     test_tmp = result_to_tqdm_template(result, training=False)
-                    process_log.set_description_str("Training")
+                    if verbose:
+                        process_log.set_description_str("Training")
             postfix = train_tmp + "- " + test_tmp
 
             n_iter += 1
-            
-            process_log.set_postfix_str(postfix)
+            if verbose:
+                process_log.set_postfix_str(postfix)
 
             if n_iter >= iterations:
                 break

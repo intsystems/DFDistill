@@ -7,8 +7,21 @@ import random
 import numpy as np
 import torch.nn.functional as F
 from torch.utils.data import DataLoader, TensorDataset
+from tqdm.auto import tqdm
 
-from vanilla_distilation import distill
+from .vanilla_distillation import distill
+
+
+def denormalize(image_tensor):
+    
+    mean = np.array([0.5, 0.5, 0.5])
+    std = np.array([0.5, 0.5, 0.5])
+
+    for c in range(3):
+        m, s = mean[c], std[c]
+        image_tensor[:, c] = torch.clamp(image_tensor[:, c] * s + m, 0, 1)
+
+    return image_tensor
 
 
 class DeepInversionFeatureHook:
@@ -37,7 +50,7 @@ def get_image_prior_losses(inputs_jit):
     diff3 = inputs_jit[:, :, 1:, :-1] - inputs_jit[:, :, :-1, 1:]
     diff4 = inputs_jit[:, :, :-1, :-1] - inputs_jit[:, :, 1:, 1:]
 
-    loss_var_l2 = torch.norm(diff1) + torch.norm(diff2) + torch.norm(diff3) + torch.norm(diff4)
+    loss_var_l2 = torch.sum(diff1**2)**0.5 + torch.sum(diff2**2)**0.5 + torch.sum(diff3**2)**0.5 + torch.sum(diff4**2)**0.5
     loss_var_l1 = (diff1.abs() / 255.0).mean() + (diff2.abs() / 255.0).mean() + (
             diff3.abs() / 255.0).mean() + (diff4.abs() / 255.0).mean()
     loss_var_l1 = loss_var_l1 * 255.0
@@ -63,7 +76,10 @@ class DeepInversionClass:
         main_loss_multiplier=1.0,
         lr=0.03,
         adi_scale=1, # paper suggests 10, but the repo just ignores "adaptive" case..
-    ):
+        device="cuda"
+    ):  
+        self.device = device 
+
         self.path = path
         self.final_data_path = final_data_path
 
@@ -87,7 +103,7 @@ class DeepInversionClass:
 
         self.loss_r_feature_layers = []
 
-        for module in self.net_teacher.modules():
+        for module in self.teacher.modules():
             if isinstance(module, nn.BatchNorm2d):
                 self.loss_r_feature_layers.append(DeepInversionFeatureHook(module))
 
@@ -96,24 +112,25 @@ class DeepInversionClass:
     def get_images(
         self,
     ):
+        device = self.device
         teacher = self.teacher
         student = self.student
 
         student.eval()
 
-        kl_loss = nn.KLDivLoss(reduction="batchmean").cuda()
+        kl_loss = nn.KLDivLoss(reduction="batchmean").to(device)
 
         criterion = nn.CrossEntropyLoss()
 
-        targets = torch.Longtensor([random.randint(0,self.n_classes) for _ in range(self.batch_size)]).cuda()
-        inputs = torch.randn((self.batch_size, *self.image_shape), requires_grad=True, device="cuda", dtype=torch.float32)
+        targets = torch.LongTensor([random.randint(0,self.n_classes - 1) for _ in range(self.batch_size)]).to(device)
+        inputs = torch.randn((self.batch_size, *self.image_shape), requires_grad=True, device=device, dtype=torch.float32)
 
         optimizer = optim.SGD(student.parameters(), lr=self.lr)
 
 
         optimizer = optim.Adam([inputs], lr=self.lr)
 
-        for iteration_loc in range(self.n_iterations):
+        for iteration_loc in tqdm(range(self.n_iterations), desc="Getting_images", leave=False):
 
             if random.random() > 0.5:
                 inputs = torch.flip(inputs, dims=(3,))
@@ -168,13 +185,17 @@ class DeepInversionClass:
 
         optimizer.state = defaultdict(dict)
 
-        return torch.clamp(inputs, 0, 1), targets
+        return denormalize(inputs).detach(), targets.detach()
     
 
 def distill_deep_inversion(
     teacher=None, 
     student=None,
-    config={},
+    distill_config={
+        "alpha": 0.6,
+        "T": 2.5,
+        "lr": 0.001
+    },
     total_iterations=100000,
     distill_k_times=8,
     batch_size=256,
@@ -190,6 +211,7 @@ def distill_deep_inversion(
     main_loss_multiplier=1.0,
     lr=0.1,
     adi_scale=1, # paper suggests 10, but the repo just ignores "adaptive" case..
+    device="cuda"
 ):
     
 
@@ -208,17 +230,25 @@ def distill_deep_inversion(
         main_loss_multiplier=main_loss_multiplier,
         lr=lr,
         adi_scale=adi_scale,
+        device=device
     )   
 
-    optimizer = torch.optim.Adam(student.parameters(), lr=config.get("lr", 1e-3), betas=config.get("betas", (0.9, 0.95)))
+    optimizer = torch.optim.Adam(
+        student.parameters(), 
+        lr=distill_config.get("lr", 1e-3), 
+        betas=distill_config.get("betas", (0.8, 0.9))
+    )
 
-    alpha=config.get("alpha",0.6)
-    T = config.get("T", 2.5)
+    alpha=distill_config.get("alpha",0.6)
+    T = distill_config.get("T", 2.5)
 
-    num_steps = total_iterations // batch_size
+    num_steps = total_iterations // deep_inversion_batch_size
 
-    for step in range(num_steps):
+    for step in tqdm(range(num_steps), desc="Pipeline iters", leave=True):
         inputs, targets = deep_inversion.get_images()   
+
+        teacher.zero_grad()
+        student.zero_grad()
 
         loader = DataLoader(
             TensorDataset(inputs, targets),
@@ -235,7 +265,8 @@ def distill_deep_inversion(
             iterations=distill_k_times * deep_inversion_batch_size // batch_size,
             test_freq=-1,
             alpha=alpha,
-            T=T
+            T=T,
+            verbose=False
         )
     
     return student
