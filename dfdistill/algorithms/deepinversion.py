@@ -232,10 +232,10 @@ def distill_deep_inversion(
         "lr": 0.001
     },
     total_iterations=100000,
-    distill_k_times=8,
+    distill_k_times=64,
     batch_size=256,
     deep_inversion_batch_size=1024,
-    deep_inversion_iterations=200,
+    deep_inversion_iterations=100,
     n_classes=100,
     image_shape=(3, 32, 32),
     r_feature=0.01,
@@ -246,7 +246,8 @@ def distill_deep_inversion(
     main_loss_multiplier=1.0,
     lr=0.1,
     adi_scale=1, # paper suggests 10, but the repo just ignores "adaptive" case..
-    device="cuda"
+    device="cuda",
+    **kwargs
 ):    
 
     """
@@ -283,7 +284,7 @@ def distill_deep_inversion(
     deep_inversion = DeepInversionClass(
         teacher=teacher,
         student=student,
-        batch_size=batch_size,
+        batch_size=deep_inversion_batch_size,
         n_iterations=deep_inversion_iterations,
         n_classes=n_classes,
         image_shape=image_shape,
@@ -313,7 +314,7 @@ def distill_deep_inversion(
         inputs, targets = deep_inversion.get_images()   
 
         teacher.zero_grad()
-        student.zero_grad()
+        student.train()
 
         loader = DataLoader(
             TensorDataset(inputs, targets),

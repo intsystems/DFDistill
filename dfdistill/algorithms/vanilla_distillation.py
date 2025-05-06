@@ -309,10 +309,11 @@ def distill(
     train_loader: torch.utils.data.DataLoader,
     test_loader: torch.utils.data.DataLoader = None,
     iterations: int = 5000, 
-    test_freq: int = 1000,
+    test_freq: int = -1,
     alpha: float = 0.6, 
     T: float = 2.5,
-    verbose=True
+    verbose=True,
+    **kwargs
 ):
     """
     Performs knowledge distillation using the provided teacher model and
@@ -384,7 +385,7 @@ def distill(
 
                     if verbose:
                         process_log.set_description_str("Training")
-                        
+
             postfix = train_tmp + "- " + test_tmp
 
             n_iter += 1

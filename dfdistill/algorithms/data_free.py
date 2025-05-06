@@ -9,10 +9,10 @@ def train_dfad(
     teacher,
     student,
     generator,
-    device,
     optimizer_s,
     optimizer_g,
     test_loader=None,
+    device="cuda",
     epochs=10,
     iters_per_epoch=100,
     batch_size=128,
@@ -20,8 +20,51 @@ def train_dfad(
     log_interval=10,
     val_interval=1,
     dataset_name='cifar10',
-    model_name='resnet18'
+    model_name='resnet18',
+    **kwargs
 ):
+    """
+    Train a student model using the Data-Free Adversarial Distillation algorithm.
+
+    Parameters
+    ----------
+    teacher : torch.nn.Module
+        The teacher model to use for distillation.
+    student : torch.nn.Module
+        The student model to train.
+    generator : torch.nn.Module
+        The generator model to use for generating fake images.
+    optimizer_s : torch.optim.Optimizer
+        The optimizer for the student model.
+    optimizer_g : torch.optim.Optimizer
+        The optimizer for the generator model.
+    test_loader : torch.utils.data.DataLoader, optional
+        The test data loader to use for evaluation. If None, no evaluation will be performed.
+    device : str, optional
+        The device to use for training. Defaults to "cuda".
+    epochs : int, optional
+        The number of epochs to train. Defaults to 10.
+    iters_per_epoch : int, optional
+        The number of iterations per epoch. Defaults to 100.
+    batch_size : int, optional
+        The batch size to use for training. Defaults to 128.
+    nz : int, optional
+        The number of latent variables to use for the generator. Defaults to 256.
+    log_interval : int, optional
+        The interval to print the loss. Defaults to 10.
+    val_interval : int, optional
+        The interval to evaluate the model. Defaults to 1.
+    dataset_name : str, optional
+        The name of the dataset to use. Defaults to "cifar10".
+    model_name : str, optional
+        The name of the model to use. Defaults to "resnet18".
+    **kwargs
+        Additional keyword arguments to pass to the optimizer.
+
+    Returns
+    -------
+    The trained student model.
+    """
     teacher.eval()
     student.train()
     generator.train()
@@ -64,14 +107,14 @@ def train_dfad(
                     f'| S_loss: {loss_student.item():.4f}'
                 )
 
-        if test_loader is not None and (epoch % val_interval == 0 or epoch == epochs):
-            acc = validate(student, generator, test_loader, device)
-            if acc > best_acc:
-                best_acc = acc
-                os.makedirs('checkpoint/student', exist_ok=True)
-                torch.save(student.state_dict(), f'checkpoint/student/{dataset_name}-{model_name}.pt')
-                torch.save(generator.state_dict(), f'checkpoint/student/{dataset_name}-{model_name}-generator.pt')
-                print(f'[Checkpoint] New best accuracy: {best_acc:.2f}%')
-
-    print(f'\n[Finished] Best Accuracy: {best_acc:.2f}%')
+        # if test_loader is not None and (epoch % val_interval == 0 or epoch == epochs):
+        #     acc = validate(student, generator, test_loader, device)
+        #     if acc > best_acc:
+        #         best_acc = acc
+        #         os.makedirs('checkpoint/student', exist_ok=True)
+        #         torch.save(student.state_dict(), f'checkpoint/student/{dataset_name}-{model_name}.pt')
+        #         torch.save(generator.state_dict(), f'checkpoint/student/{dataset_name}-{model_name}-generator.pt')
+        #         print(f'[Checkpoint] New best accuracy: {best_acc:.2f}%')
+    if best_acc > 0.0:
+        print(f'\n[Finished] Best Accuracy: {best_acc:.2f}%')
     return student

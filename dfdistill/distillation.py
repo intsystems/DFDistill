@@ -3,22 +3,44 @@ import warnings
 
 from algorithms.deepinversion import distill_deep_inversion
 from algorithms.data_free import train_dfad
+from algorithms.vanilla_distillation import distill
 
 
 def run_distillation(
     algorithm_name: str,
     teacher,
     student,
-    train_loader,
     test_loader=None,
     config=None,
 ):
+    """
+    Run a distillation algorithm.
+
+    Parameters
+    ----------
+    algorithm_name : str
+        The name of the algorithm to run. Available algorithms are "vanilla", "dfad" and "deepinversion".
+    teacher : torch.nn.Module
+        The teacher model to use for distillation.
+    student : torch.nn.Module
+        The student model to train.
+    test_loader : torch.utils.data.DataLoader, optional
+        The test data loader to use for evaluation. If None, no evaluation will be performed.
+    config : dict, optional
+        Additional keyword arguments to pass to the algorithm.
+
+    Returns
+    -------
+    The trained student model.
+    """
+
     if config is None:
         config = {}
 
     supported_algorithms = {
         "dfad": train_dfad,
-        "deepinv": distill_deep_inversion,
+        "deepinversion": distill_deep_inversion,
+        "vanilla": distill
     }
 
     if algorithm_name not in supported_algorithms:
@@ -33,7 +55,6 @@ def run_distillation(
     base_args = {
         'teacher': teacher,
         'student': student,
-        'train_loader': train_loader,
         'test_loader': test_loader
     }
 
