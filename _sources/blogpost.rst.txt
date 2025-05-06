@@ -64,7 +64,7 @@ In our work, we investigate several DKDF algorithms, which are briefly described
   
   where :math:`\mu_T^l, \sigma_T^l` are the teacher’s precomputed mean and standard deviation.
 
-  .. image:: images/DFDistill_Framework.png
+  .. image:: images/Statistical.png
      :width: 60%
      :align: center
      :alt: The workflow of Statistical Feature Matching
@@ -77,7 +77,7 @@ In our work, we investigate several DKDF algorithms, which are briefly described
   
     \min_{x'} \sum_{l} \|\mathcal{F}(\phi_T^l) - \mathcal{F}(\phi_S^l(x'))\|_F^2
 
-  .. image:: images/DFDistill_Framework.png
+  .. image:: images/Spectral.png
      :width: 40%
      :align: center
      :alt: The workflow of Statistical Feature Matching
