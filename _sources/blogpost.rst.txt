@@ -28,7 +28,7 @@ Let :math:`T` be a pre-trained teacher model with parameters :math:`\theta_T`, a
 Here, :math:`T(x)` and :math:`S(x)` are probability distributions of the teacher and student, respectively. This approach requires access to 
 :math:`\mathcal{D}`, which becomes problematic when data is unavailable.
 
-.. image:: images/ClassicalDistill.png
+.. image:: docs/images/ClassicalDistill.png
    :width: 65%
    :align: center
    :alt: The workflow of classical KD
@@ -44,7 +44,7 @@ the objective generalizes to:
 
 The key challenge here lies in designing high quality surrogate dataset :math:`\mathcal{D}'` that is able to capture the inherent knowledge of :math:`T`.
 
-.. image:: images/DFDistill_Framework.png
+.. image:: docs/images/DFDistill_Framework.png
    :width: 95%
    :align: center
    :alt: The workflow of DFKD
@@ -63,7 +63,7 @@ batch normalization statistics:
 
 where :math:`\mu_T^l, \sigma_T^l` are the teacher’s precomputed mean and standard deviation.
 
-.. image:: images/DFDistill_Framework.png
+.. image:: docs/images/DFDistill_Framework.png
    :width: 60%
    :align: center
    :alt: The workflow of Statistical Feature Matching

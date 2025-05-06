@@ -112,7 +112,7 @@ adversarial examples) and use these to train the student.</p>
 \[\mathcal{L}_{\text{KD}} = \mathbb{E}_{x \sim \mathcal{D}} \left[ \text{KL}\left(T(x) \, \| \, S(x)\right) \right]\]</div>
 <p>Here, <span class="math notranslate nohighlight">\(T(x)\)</span> and <span class="math notranslate nohighlight">\(S(x)\)</span> are probability distributions of the teacher and student, respectively. This approach requires access to
 <span class="math notranslate nohighlight">\(\mathcal{D}\)</span>, which becomes problematic when data is unavailable.</p>
-<a class="reference internal image-reference" href="_images/ClassicalDistill.png"><img alt="The workflow of classical KD" class="align-center" src="_images/ClassicalDistill.png" style="width: 65%;" />
+<a class="reference internal image-reference" href="docs/images/ClassicalDistill.png"><img alt="The workflow of classical KD" class="align-center" src="docs/images/ClassicalDistill.png" style="width: 65%;" />
 </a>
 <p><strong>Transition to Data-Free Knowledge Distillation (DFKD)</strong></p>
 <p>In our case, when <span class="math notranslate nohighlight">\(\mathcal{D}\)</span> is inaccessible, DFKD synthesizes a surrogate dataset <span class="math notranslate nohighlight">\(\mathcal{D}' = \{x'_i\}_{i=1}^M\)</span> directly from <span class="math notranslate nohighlight">\(T\)</span>. Therefore,
@@ -120,7 +120,7 @@ the objective generalizes to:</p>
 <div class="math notranslate nohighlight">
 \[\mathcal{L}_{\text{DFKD}} = \mathbb{E}_{x' \sim \mathcal{D}'} \left[ \text{KL}\left(T(x') \, \| \, S(x')\right) \right]\]</div>
 <p>The key challenge here lies in designing high quality surrogate dataset <span class="math notranslate nohighlight">\(\mathcal{D}'\)</span> that is able to capture the inherent knowledge of <span class="math notranslate nohighlight">\(T\)</span>.</p>
-<a class="reference internal image-reference" href="_images/DFDistill_Framework.png"><img alt="The workflow of DFKD" class="align-center" src="_images/DFDistill_Framework.png" style="width: 95%;" />
+<a class="reference internal image-reference" href="docs/images/DFDistill_Framework.png"><img alt="The workflow of DFKD" class="align-center" src="docs/images/DFDistill_Framework.png" style="width: 95%;" />
 </a>
 </section>
 <section id="dkdf-algorithms">
@@ -132,7 +132,7 @@ batch normalization statistics:</p>
 <div class="math notranslate nohighlight">
 \[\min_{x'} \sum_{l} \left( \|\mu_T^l - \mu_S^l(x')\|_2^2 + \|\sigma_T^l - \sigma_S^l(x')\|_2^2 \right),\]</div>
 <p>where <span class="math notranslate nohighlight">\(\mu_T^l, \sigma_T^l\)</span> are the teacher’s precomputed mean and standard deviation.</p>
-<a class="reference internal image-reference" href="_images/DFDistill_Framework.png"><img alt="The workflow of Statistical Feature Matching" class="align-center" src="_images/DFDistill_Framework.png" style="width: 60%;" />
+<a class="reference internal image-reference" href="docs/images/DFDistill_Framework.png"><img alt="The workflow of Statistical Feature Matching" class="align-center" src="docs/images/DFDistill_Framework.png" style="width: 60%;" />
 </a>
 <ul class="simple">
 <li><p><strong>Spectral Feature Matching</strong></p></li>
