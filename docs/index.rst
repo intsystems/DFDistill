@@ -15,6 +15,21 @@ Welcome to DFDistill's documentation!
 
 .. toctree::
    :maxdepth: 1
+   :caption: Theoretical Background:
+   
+   blogpost.rst
+
+.. toctree::
+   :maxdepth: 1
    :caption: Get Started:
    
    installation.rst
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Packages:
+
+   stat_features.rst
+   spec_features.rst
+   adversarial.rst
+   deepinversion.rst
