@@ -156,7 +156,7 @@ def distill_stat_features(
 ):
     teacher = teacher.to(device)
     student = student.to(device)
-    
+
     # 1. collect train stats
     mean_stat, chol_stat = collect_top_layer_stats(teacher, train_loader, device)
 
@@ -206,7 +206,7 @@ def distill_stat_features(
             running_loss += loss.item()
 
             if (i + 1) % eval_every == 0 and test_loader is not None:
-                print(f'Student Epoch {epoch + 1}/{STUDENT_EPOCHS}, Batch {i}, Student Loss: {running_loss / (i+1):.4f}')
+                print(f'Student Epoch {epoch + 1}/{student_epochs}, Batch {i}, Student Loss: {running_loss / (i+1):.4f}')
                 student_accuracy = evaluate_model(student, test_loader, device)
                 print(f'Distilled Student Accuracy on original test images: {student_accuracy:.2f} %')
 
@@ -214,7 +214,7 @@ def distill_stat_features(
 
         epoch_loss = running_loss / len(gen_train_loader)
         student_train_losses.append(epoch_loss)
-        print(f'Student Epoch {epoch + 1}/{STUDENT_EPOCHS} finished. Avg Student Loss: {epoch_loss:.4f}')
+        print(f'Student Epoch {epoch + 1}/{student_epochs} finished. Avg Student Loss: {epoch_loss:.4f}')
 
     print("Finished Student Training.")
 
