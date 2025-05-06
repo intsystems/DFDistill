@@ -133,11 +133,11 @@ def evaluate_model(model, dataloader, device):
 
 
 def distill_stat_features(
-    teacher_net: nn.Module,
-    student_net: nn.Module,
+    teacher: nn.Module,
+    student: nn.Module,
 
     train_loader: DataLoader,
-    test_loader: DataLoader,
+    test_loader: DataLoader = None,
 
     reconstruction_size: int = 1024, 
     reconstruction_iterations: int = 100,
@@ -154,22 +154,24 @@ def distill_stat_features(
 
     device: str = 'cuda',
 ):
-
+    teacher = teacher.to(device)
+    student = student.to(device)
+    
     # 1. collect train stats
-    mean_stat, chol_stat = collect_top_layer_stats(teacher_net, train_loader, device)
+    mean_stat, chol_stat = collect_top_layer_stats(teacher, train_loader, device)
 
-    optimizer_student = optim.Adam(student_net.parameters(), lr=student_lr)
+    optimizer_student = optim.Adam(student.parameters(), lr=student_lr)
     student_train_losses = []
 
     for epoch in tqdm(range(student_epochs), total=student_epochs):
         
-        student_net.train()
+        student.train()
         running_loss = 0.0
 
         # 2. generate train dataset
 
         train_dataset_rec = reconstruct_train_dataset(
-            teacher_net,
+            teacher,
             mean_stat,
             chol_stat,
             reconstruction_size,
@@ -185,10 +187,10 @@ def distill_stat_features(
 
             # Получаем логиты учителя для реконструированных данных
             with torch.no_grad(): # Не считаем градиенты для учителя
-                teacher_logits = teacher_net(reconstructed_batch)
+                teacher_logits = teacher(reconstructed_batch)
 
             # Получаем логиты ученика для реконструированных данных
-            student_logits = student_net(reconstructed_batch)
+            student_logits = student(reconstructed_batch)
 
             # Вычисляем дистилляционный loss (KL divergence) [9]
             # Применяем softmax и log_softmax с температурой
@@ -203,9 +205,9 @@ def distill_stat_features(
 
             running_loss += loss.item()
 
-            if (i + 1) % eval_every == 0:
+            if (i + 1) % eval_every == 0 and test_loader is not None:
                 print(f'Student Epoch {epoch + 1}/{STUDENT_EPOCHS}, Batch {i}, Student Loss: {running_loss / (i+1):.4f}')
-                student_accuracy = evaluate_model(student_net, test_loader, device)
+                student_accuracy = evaluate_model(student, test_loader, device)
                 print(f'Distilled Student Accuracy on original test images: {student_accuracy:.2f} %')
 
 
@@ -216,4 +218,4 @@ def distill_stat_features(
 
     print("Finished Student Training.")
 
-    return student_net
+    return student

@@ -4,7 +4,7 @@ import warnings
 from algorithms.deepinversion import distill_deep_inversion
 from algorithms.data_free import train_dfad
 from algorithms.vanilla_distillation import distill
-
+from algorithms.distill_stat_features import distill_stat_features
 
 def run_distillation(
     algorithm_name: str,
@@ -40,6 +40,7 @@ def run_distillation(
     supported_algorithms = {
         "dfad": train_dfad,
         "deepinversion": distill_deep_inversion,
+        "stat_features": distill_stat_features,
         "vanilla": distill
     }
 
