@@ -2,5 +2,5 @@
 Statistical Features
 ********************
 
-.. automodule:: algorithms.stat_features
+.. automodule:: algorithms.distill_stat_features
     :members:
