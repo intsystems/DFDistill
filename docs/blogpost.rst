@@ -53,22 +53,35 @@ DKDF Algorithms
 ---------------
 
 In our work, we investigate several DKDF algorithms, which are briefly described below: 
+
 - **Statistical Feature Matching**
-Let :math:`\phi_T^l(x)` and :math:`\phi_S^l(x)` denote the activations at layer :math:`l` of :math:`T` and :math:`S`. We synthesize :math:`\mathcal{D}'` by aligning 
-batch normalization statistics:
 
-.. math::
+  Let :math:`\phi_T^l(x)` and :math:`\phi_S^l(x)` denote the activations at layer :math:`l` of :math:`T` and :math:`S`. We synthesize :math:`\mathcal{D}'` by         aligning batch normalization statistics:
+  
+  .. math::
+      
+    \min_{x'} \sum_{l} \left( \|\mu_T^l - \mu_S^l(x')\|_2^2 + \|\sigma_T^l - \sigma_S^l(x')\|_2^2 \right),
+  
+  where :math:`\mu_T^l, \sigma_T^l` are the teacher’s precomputed mean and standard deviation.
 
-  \min_{x'} \sum_{l} \left( \|\mu_T^l - \mu_S^l(x')\|_2^2 + \|\sigma_T^l - \sigma_S^l(x')\|_2^2 \right),
-
-where :math:`\mu_T^l, \sigma_T^l` are the teacher’s precomputed mean and standard deviation.
-
-.. image:: images/DFDistill_Framework.png
-   :width: 60%
-   :align: center
-   :alt: The workflow of Statistical Feature Matching
+  .. image:: images/DFDistill_Framework.png
+     :width: 60%
+     :align: center
+     :alt: The workflow of Statistical Feature Matching
 
 - **Spectral Feature Matching**
+
+  The idea is similar to the first one, but now, we extend to frequency domain by minimizing the Frobenius norm between Fourier transforms of activations:
+  
+  .. math::
+  
+    \min_{x'} \sum_{l} \|\mathcal{F}(\phi_T^l) - \mathcal{F}(\phi_S^l(x'))\|_F^2
+
+  .. image:: images/DFDistill_Framework.png
+     :width: 40%
+     :align: center
+     :alt: The workflow of Statistical Feature Matching
+
 - **Adversarial Distillation**
 - **Deep Inversion**
 
