@@ -1,4 +1,4 @@
 .python-version
 *__pycache__
-./data
+*data
 *.ipynb_checkpoints
