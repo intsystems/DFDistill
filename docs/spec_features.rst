@@ -2,5 +2,5 @@
 Spectral Features
 *****************
 
-.. automodule:: algorithms.spec_features
+.. automodule:: algorithms.distill_spec_features
     :members:
