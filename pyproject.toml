@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "jupyter>=1.1.1",
+    "matplotlib>=3.10.3",
     "numpy>=2.2.5",
     "pandas>=2.2.3",
     "pytorch-ignite>=0.5.2",
