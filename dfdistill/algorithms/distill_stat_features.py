@@ -12,6 +12,8 @@ import time
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
+
+
 def collect_top_layer_stats(teacher_model: nn.Module, stats_trainloader: DataLoader, device: str = 'cuda'):
     """
         Collects mean and cov from top-layer (before activations).
@@ -177,7 +179,8 @@ def distill_stat_features(
             reconstruction_size,
             reconstruction_iterations,
             reconstruction_lr,
-            reconstruction_batch_size
+            reconstruction_batch_size,
+            device
         )
 
         gen_train_loader = DataLoader(train_dataset_rec, batch_size=reconstruction_batch_size, shuffle=False)
