@@ -8,6 +8,7 @@ import numpy as np
 import torch.nn.functional as F
 from torch.utils.data import DataLoader, TensorDataset
 from tqdm.auto import tqdm
+import torchvision.transforms as transforms
 
 from .vanilla_distillation import distill
 
@@ -309,12 +310,18 @@ def distill_deep_inversion(
     T = distill_config.get("T", 2.5)
 
     num_steps = total_iterations // deep_inversion_batch_size
+    
+    transform = transforms.Compose([
+        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+    ]) 
 
     for step in tqdm(range(num_steps), desc="Pipeline iters", leave=True):
         inputs, targets = deep_inversion.get_images()   
 
         teacher.zero_grad()
         student.train()
+
+        inputs = torch.stack([transform(img) for img in inputs])
 
         loader = DataLoader(
             TensorDataset(inputs, targets),
