@@ -1,13 +1,23 @@
 import os
 import torch
 import torch.nn.functional as F
-import torch.nn as nn
-import torch.optim as optim
 import matplotlib.pyplot as plt
-from IPython.display import clear_output, display
+from IPython.display import clear_output
 
 
 def validate(student, test_loader, device="cuda", verbose=True):
+    """
+    Evaluate the student model on the test dataset.
+
+    Args:
+        student (torch.nn.Module): The student model to evaluate.
+        test_loader (DataLoader): DataLoader for the test dataset.
+        device (str, optional): Device to run evaluation on ('cuda' or 'cpu'). Default is 'cuda'.
+        verbose (bool, optional): Whether to print evaluation results. Default is True.
+
+    Returns:
+        float: Accuracy of the student model on the test data.
+    """
     student.eval()
     test_loss = 0.0
     correct = 0
@@ -31,6 +41,15 @@ def validate(student, test_loader, device="cuda", verbose=True):
 
 
 def plot_metrics(history):
+    """
+    Plot loss and accuracy curves for training progress.
+
+    Args:
+        history (dict): Dictionary containing training history with keys:
+            - 'epochs': list of epoch numbers.
+            - 'student_loss': list of student loss values.
+            - 'accuracy': list of accuracy values.
+    """
     clear_output(wait=True)
     fig, ax1 = plt.subplots(figsize=(10, 5))
 
@@ -70,6 +89,32 @@ def train_dfad(
     model_name='resnet18_8x',
     save_dir='checkpoint/student',
 ):
+    """
+    Train student and generator models using the DFAD method (Distillation with Feature Adversarial Distillation).
+
+    Args:
+        teacher (torch.nn.Module): Pretrained teacher model.
+        student (torch.nn.Module): Student model to be trained.
+        generator (torch.nn.Module): Image generator model.
+        optimizer_s (torch.optim.Optimizer): Optimizer for the student.
+        optimizer_g (torch.optim.Optimizer): Optimizer for the generator.
+        scheduler_s (torch.optim.lr_scheduler._LRScheduler, optional): Learning rate scheduler for student optimizer. Default is None.
+        scheduler_g (torch.optim.lr_scheduler._LRScheduler, optional): Learning rate scheduler for generator optimizer. Default is None.
+        test_loader (DataLoader, optional): DataLoader for test dataset, used for validation. Default is None.
+        device (str, optional): Device to run training on ('cuda' or 'cpu'). Default is 'cuda'.
+        epochs (int, optional): Number of training epochs. Default is 500.
+        iters_per_epoch (int, optional): Number of iterations per epoch. Default is 100.
+        batch_size (int, optional): Batch size. Default is 128.
+        nz (int, optional): Dimension of noise vector for generator input. Default is 256.
+        log_interval (int, optional): Interval (in iterations) to log training progress. Default is 10.
+        val_interval (int, optional): Interval (in epochs) to run validation. Default is 1.
+        dataset_name (str, optional): Dataset name for checkpoint filenames. Default is 'cifar10'.
+        model_name (str, optional): Model name for checkpoint filenames. Default is 'resnet18_8x'.
+        save_dir (str, optional): Directory to save checkpoints. Default is 'checkpoint/student'.
+
+    Returns:
+        torch.nn.Module: Trained student model.
+    """
     teacher.eval()
     student.train()
     generator.train()
@@ -85,7 +130,7 @@ def train_dfad(
         epoch_student_loss = 0.0
 
         for iteration in range(1, iters_per_epoch + 1):
-            # Train Student
+            # Train student for 5 steps
             for _ in range(5):
                 z = torch.randn(batch_size, nz, 1, 1, device=device)
                 fake_images = generator(z).detach()
@@ -98,7 +143,7 @@ def train_dfad(
                 optimizer_s.step()
                 epoch_student_loss += loss_student.item()
 
-            # Train Generator
+            # Train generator
             z = torch.randn(batch_size, nz, 1, 1, device=device)
             fake_images = generator(z)
             with torch.no_grad():
